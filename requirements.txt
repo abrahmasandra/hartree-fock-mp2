@@ -2,3 +2,6 @@ periodictable
 numpy
 pyscf
 scipy
+matplotlib
+seaborn
+pyvista
