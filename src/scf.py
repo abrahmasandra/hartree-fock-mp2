@@ -58,7 +58,7 @@ def run_scf(S, T, V, eri, n_electrons, max_iter=50, convergence=1e-8):
 
     D = np.zeros((n_orb, n_orb))  # Initial density matrix
     E_total = 0.0
-
+    energy_history = []
     for iteration in range(1, max_iter + 1):
         G = compute_g_matrix(D, eri)
         F = H_core + G
@@ -79,6 +79,7 @@ def run_scf(S, T, V, eri, n_electrons, max_iter=50, convergence=1e-8):
         E_elec = np.sum((D_new * (H_core + F)))
         delta_E = E_elec - E_total
         E_total = E_elec
+        energy_history.append(E_total)
 
         print(f"SCF Iter {iteration:2d}  E = {E_total:.10f}  dE = {delta_E:.3e}")
 
@@ -89,7 +90,7 @@ def run_scf(S, T, V, eri, n_electrons, max_iter=50, convergence=1e-8):
     else:
         print("SCF did not converge!")
 
-    return E_total, eps, C, D
+    return E_total, eps, C, D, energy_history
 
 if __name__ == "__main__":
     from molecule import Molecule
@@ -103,5 +104,5 @@ if __name__ == "__main__":
     S, T, V = compute_1e_integrals(mol, basis_name="sto-3g")
     eri = compute_2e_integrals(mol, basis_name="sto-3g")
 
-    E_scf, eps, C, D = run_scf(S, T, V, eri, mol.n_electrons)
+    E_scf, eps, C, D, energy_history = run_scf(S, T, V, eri, mol.n_electrons)
     print(f"\nFinal SCF Energy: {E_scf:.8f} Hartree")

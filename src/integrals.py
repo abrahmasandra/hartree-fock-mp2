@@ -1,22 +1,6 @@
 import numpy as np
 from pyscf import gto
-
-def build_pyscf_molecule(molecule, basis_name="sto-3g"):
-    """
-    Construct a PySCF Mole object from our Molecule class.
-    """
-    atom_str = ""
-    for sym, coord in zip(molecule.symbols, molecule.coordinates):
-        atom_str += f"{sym} {coord[0]} {coord[1]} {coord[2]}; "
-
-    mol = gto.Mole()
-    mol.atom = atom_str
-    mol.unit = "Angstrom"
-    mol.basis = basis_name
-    mol.charge = molecule.charge
-    mol.spin = molecule.multiplicity - 1  # multiplicity = 2S + 1
-    mol.build()
-    return mol
+from src.utils import build_pyscf_molecule
 
 def compute_1e_integrals(molecule, basis_name="sto-3g"):
     """
