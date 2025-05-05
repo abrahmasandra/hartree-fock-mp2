@@ -22,7 +22,6 @@ hartree-fock-mp2/
 ├── src/ # Core implementation code
 ├── tests/ # Unit tests
 ├── examples/ # Example HF + MP2 runs
-├── data/ # Basis set data
 ├── README.md
 ├── requirements.txt
 ```
