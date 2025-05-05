@@ -17,6 +17,7 @@ The goal of this project is to build a simple, modular, and educational codebase
 
 ## File Structure
 
+```plaintext
 hartree-fock-mp2/
 ├── src/ # Core implementation code
 ├── tests/ # Unit tests
@@ -24,6 +25,7 @@ hartree-fock-mp2/
 ├── data/ # Basis set data
 ├── README.md
 ├── requirements.txt
+```
 
 ## Installation
 
@@ -100,6 +102,25 @@ To use it, follow this general workflow:
     To visualize other orbitals (e.g. LUMO), simply change `mo_index`.
     
     💡 Tip: For a closed-shell molecule with `n` electrons, the HOMO is at index `n // 2 - 1` and the LUMO is at index `n // 2`.
+
+## Examples
+
+The `examples/` folder contains ready-to-run scripts demonstrating how to use this package on real molecules. These examples include full Hartree-Fock workflows, optional MP2 correlation energy corrections, and 3D molecular orbital visualization using PyVista.
+
+### 📄 Available examples
+
+- `h2_sto3g.py` – Minimal H₂ molecule with HF and MP2
+- `h2o_sto3g.py` – Water molecule, visualize HOMO/LUMO
+- `nh3_sto3g.py` – Ammonia molecule with orbital plotting
+- `co_sto3g.py` – Carbon monoxide, small polar molecule
+
+To run an example:
+
+```bash
+python -m examples.h2o_sto3g
+```
+
+💡 You can modify any script in examples/ to experiment with different geometries, basis sets, or orbitals. Visualization defaults to PyVista but can be adapted.
 
 ## Testing
 
