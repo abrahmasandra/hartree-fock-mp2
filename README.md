@@ -98,6 +98,7 @@ To use it, follow this general workflow:
     ```
 
     To visualize other orbitals (e.g. LUMO), simply change `mo_index`.
+    
     💡 Tip: For a closed-shell molecule with `n` electrons, the HOMO is at index `n // 2 - 1` and the LUMO is at index `n // 2`.
 
 ## Testing
