@@ -28,6 +28,60 @@ def compute_g_matrix(D, eri):
     G = 2 * J - K
     return G
 
+def orthogonalizer(S):
+    """
+    Compute the symmetric orthogonalization matrix A = S^{-1/2}.
+    Args:
+        S: Overlap matrix
+    Returns:
+        S_inv_sqrt: Symmetric orthogonalizer
+    """
+    eigvals, eigvecs = eigh(S)
+    S_inv_sqrt = eigvecs @ np.diag(1 / np.sqrt(eigvals)) @ eigvecs.T
+    return S_inv_sqrt
+
+def build_fock_matrix(H_core, D, eri):
+    """
+    Build the Fock matrix.
+    Args:
+        H_core: Core Hamiltonian matrix
+        D: Density matrix
+        eri: Two-electron integrals
+    Returns:
+        F: Fock matrix
+    """
+    G = compute_g_matrix(D, eri)
+    F = H_core + G
+    return F
+
+def solve_roothaan_equations(F, S_inv_sqrt):
+    """
+    Solve the Roothaan equations in the orthonormal basis.
+    Args:
+        F: Fock matrix
+        S_inv_sqrt: Symmetric orthogonalizer
+    Returns:
+        eps: Orbital energies
+        C: MO coefficients in AO basis
+    """
+    F_prime = S_inv_sqrt @ F @ S_inv_sqrt
+    eps, C_prime = eigh(F_prime)
+    C = S_inv_sqrt @ C_prime
+    return eps, C
+
+def compute_density_matrix(C, n_occ):
+    """
+    Compute the density matrix from occupied orbitals.
+    Args:
+        C: MO coefficients
+        n_occ: Number of occupied orbitals
+    Returns:
+        D: Density matrix
+    """
+    C_occ = C[:, :n_occ]
+    D = C_occ @ C_occ.T
+    return D
+
 def run_scf(S, T, V, eri, n_electrons, max_iter=50, convergence=1e-8):
     """
     Perform Hartree-Fock SCF calculation.
@@ -46,34 +100,21 @@ def run_scf(S, T, V, eri, n_electrons, max_iter=50, convergence=1e-8):
         eps: Orbital energies
         C: MO coefficients
         D: Final density matrix
+        energy_history: List of SCF energies per iteration
     """
     n_orb = S.shape[0]
     n_occ = n_electrons // 2  # Restricted HF, closed-shell
 
     H_core = build_core_hamiltonian(T, V)
-
-    # Orthogonalizer A = S^{-1/2}
-    eigvals, eigvecs = eigh(S)
-    S_inv_sqrt = eigvecs @ np.diag(1 / np.sqrt(eigvals)) @ eigvecs.T
+    S_inv_sqrt = orthogonalizer(S)
 
     D = np.zeros((n_orb, n_orb))  # Initial density matrix
     E_total = 0.0
     energy_history = []
     for iteration in range(1, max_iter + 1):
-        G = compute_g_matrix(D, eri)
-        F = H_core + G
-
-        # Step 1: Transform Fock matrix to orthonormal basis
-        F_prime = S_inv_sqrt @ F @ S_inv_sqrt
-
-        # Step 2: Solve standard eigenvalue problem (this is the secular equation in orthonormal basis)
-        eps, C_prime = eigh(F_prime)
-
-        # Step 3: Transform back to original (non-orthogonal) AO basis
-        C = S_inv_sqrt @ C_prime
-        C_occ = C[:, :n_occ]
-
-        D_new = C_occ @ C_occ.T
+        F = build_fock_matrix(H_core, D, eri)
+        eps, C = solve_roothaan_equations(F, S_inv_sqrt)
+        D_new = compute_density_matrix(C, n_occ)
 
         # Compute electronic energy
         E_elec = np.sum((D_new * (H_core + F)))
