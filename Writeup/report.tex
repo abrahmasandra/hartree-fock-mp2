@@ -4,6 +4,10 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{geometry}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{mhchem}
 \geometry{margin=1in}
 
 \title{Hartree-Fock and MP2 Implementation Report}
@@ -34,9 +38,33 @@ The Møller-Plesset perturbation theory of second order (MP2) provides a systema
 Outline the organization of the codebase and key modules.
 
 \subsection{Algorithms}
-Describe the main algorithms used for SCF convergence and MP2 energy calculation.
+
+\begin{algorithm}
+\caption{Hartree-Fock Self-Consistent Field (SCF) Method}
+\begin{algorithmic}[1]
+
+\Statex \textbf{Input:} Basis set $\{\phi\}$; Coordinates $\{\vec{r}\}$
+\Statex \textbf{Output:} Molecular orbitals; Energy
+
+\State $P_{ij} \gets $ Guess
+\State $S_{ij} \gets \langle \phi_i | \phi_j \rangle$ \Comment{PySCF}
+\State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{PySCF}
+
+\While{not converged}
+    \State $F_{ij} \gets \langle \phi_i \: | \: T + \sum_k^{\text{nuclei}}V_k \: |\: \phi_j \rangle + \sum_{kl} P_{kl} \Big[ G_{ijkl} - \frac{1}{2} G_{ikjl} \Big]$
+
+\EndWhile
+
+
+\end{algorithmic}
+\end{algorithm}
 
 \section{Results}
+Using our code, we calculated the energies of different molecular systems, where we calculated the energy and compared these results with the established literature values
+\begin{itemize}
+    \item Energy of $\ce{H2O}$: -84.2310577768
+    \item Energy of $\ce{H2}$:
+\end{itemize}
 Present sample results, such as total energies for test molecules, and compare HF and MP2 results.
 
 \section{Conclusion}
