@@ -23,10 +23,10 @@ The Hartree-Fock method is a foundational approach in quantum chemistry for appr
 
 \section{Theoretical Background}
 \subsection{Hartree-Fock Method}
-Briefly describe the HF equations, self-consistent field (SCF) procedure, and the role of basis sets.
+The Hartree-Fock (HF) method approximates the many-electron wavefunction as a single Slater determinant of molecular orbitals, leading to a set of coupled integro-differential equations known as the HF equations. These equations are solved iteratively using the self-consistent field (SCF) procedure: starting from an initial guess for the orbitals, the Fock matrix is constructed, diagonalized to obtain new orbitals, and the process is repeated until convergence. Basis sets, typically composed of atomic orbitals or Gaussian functions, are used to represent the molecular orbitals and make the calculations tractable.
 
 \subsection{MP2 Correction}
-Summarize the MP2 energy correction and its significance in improving upon HF results.
+The Møller-Plesset perturbation theory of second order (MP2) provides a systematic way to include electron correlation effects that are neglected in the Hartree-Fock approximation. In MP2, the total electronic energy is corrected by adding a second-order perturbative term, which accounts for the interactions between electron pairs that are not captured by the mean-field HF approach. The MP2 energy correction is computed using the HF molecular orbitals and their corresponding energies, and involves summing over all possible double excitations from occupied to virtual orbitals. This correction typically lowers the total energy and yields more accurate results for molecular properties, especially in systems where electron correlation plays a significant role.
 
 \section{Implementation Details}
 
