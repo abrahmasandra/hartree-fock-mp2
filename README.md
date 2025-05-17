@@ -43,7 +43,50 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 ```
 
-## Usage
+## Running the Main Program
+
+You can run the main driver script using:
+
+```bash
+python main.py --molecule h2o --mo-index 3 --output results.txt
+```
+
+This will run the Hartree-Fock calculation for the water molecule (H₂O) and output the results to `results.txt`. You can specify different molecules and molecular orbital indices as needed.
+
+### 🔧 Available arguments
+
+- `--molecule`  
+  Select one of the predefined molecules to simulate. Options include:
+  - `h2`
+  - `h2o`
+  - `nh3`
+  - `ch4`  
+  Default: `h2o`
+
+- `--mo-index`  
+  The index of the molecular orbital to visualize. Use:
+  - HOMO ≈ `n_electrons // 2 - 1`
+  - LUMO ≈ `n_electrons // 2`
+
+- `--output`  
+  Name of the file to save computed SCF and MP2 energy results.  
+  Default: `results.txt`
+
+---
+
+### 📥 Example: Run MP2 calculation on ammonia and visualize the HOMO
+
+```bash
+python main.py --molecule nh3 --mo-index 4 --output nh3_energy.txt
+```
+
+This will:
+
+- Run Hartree-Fock and MP2 energy calculations  
+- Print and save the results to `nh3_energy.txt`  
+- Display the 3D isosurface plot of molecular orbital #4
+
+## Usage (Python Code)
 
 This package implements Hartree-Fock (HF) and MP2 quantum chemistry calculations from first principles, with support for molecular orbital visualization.
 
@@ -71,6 +114,7 @@ To use it, follow this general workflow:
 
    ```python
    E_scf, eps, C, D, energy_history = run_scf(S, T, V, eri, mol.n_electrons)
+   E_scf_total = compute_total_energy(E_scf, mol) # adds nuclear-nuclear repulsion term
    ```
 
 4. **Compute MP2 Energy**
@@ -80,7 +124,7 @@ To use it, follow this general workflow:
     n_occ = mol.n_electrons // 2
     eri_mo = transform_eri_ao_to_mo(eri_ao, C)
     E_mp2_corr = compute_mp2_energy(eri_mo, eps, n_occ)
-    E_total = E_scf + E_mp2_corr
+    E_total = E_scf_total + E_mp2_corr
     ```
 
 5. **Visualize Molecular Orbitals (Optional)**

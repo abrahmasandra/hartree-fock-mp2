@@ -20,9 +20,14 @@ def main():
 
     # Define molecule (default: H2O)
     mol = MOLECULE_PRESETS[args.molecule]
+    print(f"Loaded molecule: {args.molecule.upper()}")
+    print(f"Number of electrons: {mol.n_electrons}")
+
 
     # Integrals
     S, T, V = compute_1e_integrals(mol)
+    print(f"Number of basis functions (orbitals): {S.shape[0]}")
+    
     eri = compute_2e_integrals(mol)
 
     # SCF
