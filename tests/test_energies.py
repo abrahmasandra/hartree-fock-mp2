@@ -48,3 +48,26 @@ def test_h2o_comparison():
         [-0.758602, 0.000000,  0.504284]
     ]
     compare_energies(symbols, coords)
+
+def test_nh3_comparison():
+    symbols = ["N", "H", "H", "H"]
+    coords = [
+        [0.0000, 0.0000, 0.1173],
+        [0.9377, 0.0000, -0.4692],
+        [-0.4688, 0.8126, -0.4692],
+        [-0.4688, -0.8126, -0.4692]
+    ]
+    compare_energies(symbols, coords)
+
+def test_ch4_comparison():
+    symbols = ["C", "H", "H", "H", "H"]
+    coords = [
+        [0.0000, 0.0000, 0.0000],
+        [1.0890, 0.0000, 0.0000],
+        [-0.3630, 1.0525, 0.0000],
+        [-0.3630, -0.5263, 1.0525],
+        [-0.3630, -0.5263, -1.0525]
+    ]
+    compare_energies(symbols, coords)
+
+
