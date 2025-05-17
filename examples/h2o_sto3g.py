@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     # Use PySCF for orbital evaluation
     pyscf_mol = build_pyscf_molecule(mol)
-    mo_grid, grid_pts = evaluate_mo_on_grid(pyscf_mol, C, mo_index=3)  # HOMO for H2O
+    mo_grid, grid_pts = evaluate_mo_on_grid(pyscf_mol, C, mo_index=5)  # HOMO for H2O
 
     plot_molecular_orbital(
         mo_grid, grid_pts,

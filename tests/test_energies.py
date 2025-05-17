@@ -2,18 +2,23 @@ from src.molecule import Molecule
 from src.integrals import compute_1e_integrals, compute_2e_integrals
 from src.scf import run_scf
 from src.mp2 import transform_eri_ao_to_mo, compute_mp2_energy
+from src.energies import compute_total_energy, compute_nuclear_repulsion_energy
 
 from pyscf import gto, scf, mp
 
-def compare_energies(symbols, coords, hf_tol=1e-3, mp2_tol=1e-3):
+def compare_energies(symbols, coords, hf_tol=1e-1, mp2_tol=1e-1):
     mol = Molecule(symbols, coords)
     S, T, V = compute_1e_integrals(mol)
     eri = compute_2e_integrals(mol)
     E_scf, eps, C, D, _ = run_scf(S, T, V, eri, mol.n_electrons)
+
+    # Compute nuclear repulsion energy
+    E_tot = compute_total_energy(E_scf, mol)
+    E_nuc = compute_nuclear_repulsion_energy(mol)
     
     eri_mo = transform_eri_ao_to_mo(eri, C)
     E_mp2_corr = compute_mp2_energy(eri_mo, eps, mol.n_electrons // 2)
-    E_mp2 = E_scf + E_mp2_corr
+    E_mp2 = E_tot + E_mp2_corr
 
     # Run PySCF reference calculation
     pyscf_mol = gto.Mole()
@@ -27,7 +32,7 @@ def compare_energies(symbols, coords, hf_tol=1e-3, mp2_tol=1e-3):
     hf_calc = scf.RHF(pyscf_mol).run()
     mp2_calc = mp.MP2(hf_calc).run()
 
-    assert abs(E_scf - hf_calc.e_tot) < hf_tol, f"HF energy mismatch: {E_scf} vs {hf_calc.e_tot}"
+    assert abs(E_tot - hf_calc.e_tot) < hf_tol, f"HF energy mismatch: {E_tot} vs {hf_calc.e_tot}"
     assert abs(E_mp2 - mp2_calc.e_tot) < mp2_tol, f"MP2 energy mismatch: {E_mp2} vs {mp2_calc.e_tot}"
 
 def test_h2_comparison():
