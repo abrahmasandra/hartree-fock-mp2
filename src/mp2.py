@@ -3,18 +3,16 @@ import numpy as np
 def transform_eri_ao_to_mo(eri_ao, C):
     """
     Transform AO-basis ERIs (μν|λσ) to MO-basis ERIs (pq|rs).
-    Full 4-index transformation: (μν|λσ) -> (pq|rs)
+    Assumes AO ERIs are in chemist's notation from PySCF ("int2e").
 
     Args:
-        eri_ao (np.ndarray): Two-electron integrals in AO basis (μν|λσ).
-                             Shape: (n_orb, n_orb, n_orb, n_orb)
-        C (np.ndarray): MO coefficients matrix.
-                        Shape: (n_orb, n_mo)
+        eri_ao (np.ndarray): AO-basis 2-electron integrals (μν|λσ), shape (n,n,n,n)
+        C (np.ndarray): MO coefficient matrix, shape (n,n)
+
     Returns:
-        np.ndarray: Two-electron integrals in MO basis (pq|rs).
-                    Shape: (n_mo, n_mo, n_mo, n_mo)
+        np.ndarray: MO-basis 2-electron integrals (pq|rs), shape (n,n,n,n)
     """
-    return np.einsum("pqrs,pi,qj,rk,sl->ijkl", eri_ao, C, C, C, C, optimize=True)
+    return np.einsum("munv,mi,nj,uk,vl->ijkl", eri_ao, C, C, C, C, optimize=True)
 
 def compute_mp2_energy(mo_eri, mo_energies, n_occ):
     """
