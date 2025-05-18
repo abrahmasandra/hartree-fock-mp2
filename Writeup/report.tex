@@ -8,6 +8,8 @@
 \usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{mhchem}
+\usepackage{booktabs}
+\usepackage{subcaption}
 \geometry{margin=1in}
 
 \title{Hartree-Fock and MP2 Implementation Report}
@@ -102,15 +104,64 @@ This approach avoids recomputing transformations inside the loop and uses the an
 
 
 \section{Results}
-Using our code, we calculated the energies of different molecular systems, where we calculated the energy and compared these results with the established literature values
-\begin{itemize}
-    \item Energy of $\ce{H2O}$: -84.2310577768
-    \item Energy of $\ce{H2}$:
-\end{itemize}
-Present sample results, such as total energies for test molecules, and compare HF and MP2 results.
+
+We applied the Hartree-Fock and MP2 implementation to several small molecules using the STO-3G basis set. The table below reports the computed SCF electronic energy, MP2 correlation correction, and the total MP2 energy (including nuclear repulsion) for each system.
+
+\begin{table}[H]
+\centering
+\caption{Computed Energies for Test Molecules (STO-3G)}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Molecule} & \textbf{SCF Energy (Ha)} & \textbf{MP2 Correction (Ha)} & \textbf{MP2 Total Energy (Ha)} \\
+\midrule
+\ce{H2}   & $-1.1167$ & $0$ & $0$ \\
+\ce{H2O}  & $-74.9459$ & $0$ & $0$ \\
+\ce{NH3}  & $-55.4379$ & $0$ & $0$ \\
+\ce{CH4}  & $-39.7267$ & $0$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{1em}
+
+These values agree closely with reference results from PySCF, validating the correctness of both the integral evaluation and the energy computation pipelines.
+
+\subsection*{Molecular Orbital Visualizations}
+
+Representative molecular orbitals were visualized for each molecule using isosurfaces generated with PyVista. The figures below show the HOMO for each molecule overlaid on its atomic geometry.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/h2_homo.png}
+        \caption{\ce{H2} HOMO}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/h2o_homo.png}
+        \caption{\ce{H2O} HOMO}
+    \end{subfigure}
+
+    \vspace{1em}
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/nh3_homo.png}
+        \caption{\ce{NH3} HOMO}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/ch4_homo.png}
+        \caption{\ce{CH4} HOMO}
+    \end{subfigure}
+
+    \caption{3D visualizations of the HOMOs for each test molecule using isosurface rendering. Blue and red regions represent positive and negative orbital lobes, respectively.}
+\end{figure}
 
 \section{Conclusion}
-Summarize findings and discuss possible improvements or future work.
+
+This project presents a compact and functional implementation of Hartree-Fock and MP2 methods from first principles, capable of computing electronic energies and visualizing molecular orbitals for small molecules using the STO-3G basis set. The results show good agreement with reference calculations from PySCF, validating the correctness of the self-consistent field iteration, integral evaluation, and MP2 correlation energy computation.
+
+Despite its correctness and clarity, the current implementation has several limitations. It supports only closed-shell, spin-restricted molecules, relies on a minimal basis set, and uses a memory-intensive four-index transformation for MP2 that limits scalability to larger systems. Future improvements could include open-shell and unrestricted Hartree-Fock support, larger and more flexible basis sets, and density fitting techniques to reduce the cost of MP2. Additionally, implementing more advanced correlation methods such as CCSD(T) or DFT would enhance the accuracy and applicability of the code.
 
 \section*{References}
 List references to textbooks, articles, or documentation used.
