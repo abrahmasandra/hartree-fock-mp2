@@ -35,29 +35,71 @@ The Møller-Plesset perturbation theory of second order (MP2) provides a systema
 \section{Implementation Details}
 
 \subsection{Code Structure}
-Outline the organization of the codebase and key modules.
+
+The codebase is organized into modular components under the \texttt{src/} package. It includes \texttt{molecule.py} for representing molecular systems, and \texttt{integrals.py} for computing one- and two-electron integrals via PySCF. The Hartree-Fock SCF procedure is implemented in \texttt{scf.py}, and MP2 correlation energies are computed in \texttt{mp2.py}. \texttt{energies.py} handles the calculation of total energies including nuclear repulsion, while \texttt{orbital\_plot.py} enables 3D visualization of molecular orbitals using PyVista. The \texttt{utils.py} module contains utility functions needed for various tasks, and the \texttt{plot\_utils.py} module provides additional plotting functions. The \texttt{examples/} folder contains usage demos for common molecules, \texttt{tests/} includes unit tests and PySCF-based validation, and \texttt{main.py} provides a command-line interface to run full SCF/MP2 workflows and visualize selected orbitals.
 
 \subsection{Algorithms}
 
-\begin{algorithm}
+\subsubsection*{Hartree-Fock Self-Consistent Field (SCF)}
+
+The Hartree-Fock SCF procedure iteratively solves the Roothaan equations to find self-consistent molecular orbitals:
+
+\[
+\mathbf{F} \mathbf{C} = \mathbf{S} \mathbf{C} \boldsymbol{\varepsilon}
+\]
+
+where $\mathbf{F}$ is the Fock matrix, $\mathbf{C}$ is the matrix of molecular orbitals, $\mathbf{S}$ is the overlap matrix, and $\boldsymbol{\varepsilon}$ is the diagonal matrix of orbital energies. The density matrix is updated at each iteration until convergence is achieved.
+
+\begin{algorithm}[H]
 \caption{Hartree-Fock Self-Consistent Field (SCF) Method}
 \begin{algorithmic}[1]
-
-\Statex \textbf{Input:} Basis set $\{\phi\}$; Coordinates $\{\vec{r}\}$
-\Statex \textbf{Output:} Molecular orbitals; Energy
-
-\State $P_{ij} \gets $ Guess
-\State $S_{ij} \gets \langle \phi_i | \phi_j \rangle$ \Comment{PySCF}
-\State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{PySCF}
-
-\While{not converged}
-    \State $F_{ij} \gets \langle \phi_i \: | \: T + \sum_k^{\text{nuclei}}V_k \: |\: \phi_j \rangle + \sum_{kl} P_{kl} \Big[ G_{ijkl} - \frac{1}{2} G_{ikjl} \Big]$
-
-\EndWhile
-
-
+\Statex \textbf{Input:} Basis set $\{\phi\}$, nuclear coordinates $\{\vec{R}\}$
+\Statex \textbf{Output:} Molecular orbitals, total energy $E_{\text{HF}}$
+\State Compute overlap matrix $S_{ij} = \langle \phi_i | \phi_j \rangle$
+\State Compute core Hamiltonian $H_{ij} = \langle \phi_i | \hat{T} + \hat{V}_{\text{nuc}} | \phi_j \rangle$
+\State Compute two-electron integrals $G_{ijkl} = (\phi_i\phi_j|\phi_k\phi_l)$
+\State Initialize density matrix $P_{ij}$ (e.g., from atomic guess)
+\Repeat
+    \State Build Fock matrix: $F_{ij} = H_{ij} + \sum_{kl} P_{kl} \left[ G_{ijkl} - \frac{1}{2} G_{ikjl} \right]$
+    \State Solve Roothaan equations: $FC = SC\varepsilon$ to obtain new orbitals $C$ and energies $\varepsilon$
+    \State Update density matrix: $P_{ij} = 2 \sum_{a}^{\text{occ}} C_{ia} C_{ja}$
+    \State Compute electronic energy: $E_{\text{elec}} = \sum_{ij} P_{ij} (H_{ij} + F_{ij})/2$
+\Until{convergence of $P_{ij}$ or $E_{\text{elec}}$}
+\State Compute total energy: $E_{\text{HF}} = E_{\text{elec}} + E_{\text{nuc}}$
 \end{algorithmic}
 \end{algorithm}
+
+\subsubsection*{MP2 Energy Correction}
+
+Second-order Møller–Plesset perturbation theory (MP2) provides a correction to the Hartree-Fock energy by accounting for electron correlation through pairwise excitations from occupied to virtual orbitals. In this implementation, the two-electron integrals are first transformed from the atomic orbital (AO) basis to the molecular orbital (MO) basis using the SCF orbital coefficients. The MP2 correlation energy is then computed by looping over all occupied and virtual orbital pairs and summing antisymmetrized contributions of the form:
+
+\[
+E_{\text{MP2}} = \sum_{ij}^{\text{occ}} \sum_{ab}^{\text{virt}} 
+\frac{\left[(ij|ab) - (ij|ba)\right]^2}{\varepsilon_i + \varepsilon_j - \varepsilon_a - \varepsilon_b}
+\]
+
+This approach avoids recomputing transformations inside the loop and uses the antisymmetrized two-electron integrals in the MO basis for improved efficiency and clarity.
+
+\begin{algorithm}[H]
+\caption{MP2 Energy Computation}
+\begin{algorithmic}[1]
+\State Transform 4-index ERIs to MO basis: 
+  \[
+  \texttt{eri\_mo}[i,j,a,b] \gets \sum_{\mu\nu\lambda\sigma} C_{\mu i} C_{\nu j} C_{\lambda a} C_{\sigma b} (\mu\nu|\lambda\sigma)
+  \]
+\State Initialize \( E_{\text{MP2}} \gets 0 \)
+\ForAll{occupied orbitals \( i, j \)}
+    \ForAll{virtual orbitals \( a, b \)}
+        \State \( (ij|ab) \gets \texttt{eri\_mo}[i,j,a,b] \)
+        \State \( (ij|ba) \gets \texttt{eri\_mo}[i,j,b,a] \)
+        \State \( \text{numerator} \gets \left[(ij|ab) - (ij|ba)\right]^2 \)
+        \State \( \text{denominator} \gets \varepsilon_i + \varepsilon_j - \varepsilon_a - \varepsilon_b \)
+        \State \( E_{\text{MP2}} \gets E_{\text{MP2}} + \frac{\text{numerator}}{\text{denominator}} \)
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
 
 \section{Results}
 Using our code, we calculated the energies of different molecular systems, where we calculated the energy and compared these results with the established literature values
