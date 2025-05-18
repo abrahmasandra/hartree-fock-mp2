@@ -8,6 +8,15 @@ from src.energies import compute_total_energy
 from src.orbital_plot import evaluate_mo_on_grid, plot_molecular_orbital
 from presets import MOLECULE_PRESETS
 
+from pyscf import gto, scf, mp
+
+def get_pyscf_reference(mol: Molecule):
+    mol = build_pyscf_molecule(mol)
+
+    hf = scf.RHF(mol).run()
+    mp2_calc = mp.MP2(hf).run()
+    return hf.e_tot, mp2_calc.e_corr, mp2_calc.e_tot
+
 def main():
     parser = argparse.ArgumentParser(description="Run HF + MP2 and visualize MO.")
     parser.add_argument("--mo-index", type=int, default=0, help="Molecular orbital index to visualize")
@@ -45,12 +54,23 @@ def main():
     print(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree")
     print(f"MP2 Total Energy:      {E_mp2_total:.8f} Hartree")
 
+    # Reference energies from PySCF
+    E_scf_ref, E_mp2_corr_ref, E_mp2_total_ref = get_pyscf_reference(mol)
+    print("--- Reference Values (PySCF) ---")
+    print(f"PySCF SCF Total Energy:     {E_scf_ref:.8f} Hartree")
+    print(f"PySCF MP2 Correction:       {E_mp2_corr_ref:.8f} Hartree")
+    print(f"PySCF MP2 Total Energy:     {E_mp2_total_ref:.8f} Hartree")
+
     # Write to file
     with open(args.output, "w") as f:
         f.write(f"SCF Electronic Energy: {E_scf:.8f} Hartree\n")
         f.write(f"SCF Total Energy:      {E_total:.8f} Hartree\n")
         f.write(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree\n")
         f.write(f"MP2 Total Energy:      {E_mp2_total:.8f} Hartree\n")
+        f.write("--- Reference Values (PySCF) ---\n")
+        f.write(f"PySCF SCF Total Energy:     {E_scf_ref:.8f} Hartree\n")
+        f.write(f"PySCF MP2 Correction:       {E_mp2_corr_ref:.8f} Hartree\n")
+        f.write(f"PySCF MP2 Total Energy:     {E_mp2_total_ref:.8f} Hartree\n")
 
     # Visualize MO
     pyscf_mol = build_pyscf_molecule(mol)
