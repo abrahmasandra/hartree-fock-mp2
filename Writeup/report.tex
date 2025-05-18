@@ -39,27 +39,46 @@ Outline the organization of the codebase and key modules.
 \subsection{Algorithms}
 
 \begin{algorithm}
-\caption{Hartree-Fock Self-Consistent Field (SCF) Method}
-\begin{algorithmic}[1]
+    \caption{Hartree-Fock Self-Consistent Field (SCF) Method}
+    \begin{algorithmic}[1]
+    
+        \Statex \textbf{Input:} Basis set $\{\phi\}$; Coordinates $\{\vec{r}\}$; Iterations $I$; Criteria $\epsilon$
+        \Statex \textbf{Output:} Molecular orbitals; Energy
+        
+        \State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{From PySCF}
+        \State $S_{ij} \gets \langle \phi_i | \phi_j \rangle$ \Comment{Overlap matrix from PySCF}
+        \State $T_{ij} \gets \langle \phi_i \: | \: -\frac{1}{2}\nabla^2 \: |\: \phi_j \rangle$ \Comment{Kinetic energy matrix from PySCF}
+        \State $V_{ij} \gets \langle \phi_i \: | \: -\sum_k^{\text{nuclei}} \frac{Z_k}{r_k} \: | \: \phi_j \rangle$ \Comment{Nuclear potential energy matrix from PySCF}
+        \State $H_{ij} \gets T_{ij} + V_{ij}$ \Comment{Core Hamiltonian matrix}
+        \State $P_{ij} \gets 0$ \Comment{Density matrix}
+        
+        \While{$\Delta E_{el} > \epsilon \: \land \: \text{Iterations} < I$}
+            \State $F_{ij} \gets H_{ij} + \sum_{kl} P_{kl} \Big[ G_{ijkl} - \frac{1}{2} G_{ikjl} \Big]$ \Comment{Fock matrix}
+            \State $\mathbf{C}, \vec{E}_{orb} \gets \text{SolveRoothaan} (\mathbf{F}, \mathbf{S})$  \Comment{Orbital coefficents and energies}
+            \State $\mathbf{P} \gets \mathbf{C}\mathbf{C}^T$ \Comment{Update density matrix}
+            \State $E_{el} \gets \sum_{ij} P_{ij} (H_{ij} + F_{ij})$ \Comment{Compute electronic energy}
+        \EndWhile
 
-\Statex \textbf{Input:} Basis set $\{\phi\}$; Coordinates $\{\vec{r}\}$
-\Statex \textbf{Output:} Molecular orbitals; Energy
+        \State \textbf{return} $E_{el}$, $\mathbf{C}$, $\mathbf{P}$
+    
+    \end{algorithmic}
+\end{algorithm}
 
-\State $P_{ij} \gets $ Guess
-\State $S_{ij} \gets \langle \phi_i | \phi_j \rangle$ \Comment{PySCF}
-\State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{PySCF}
+\begin{algorithm}
+    \caption{Solving the Roothaan equation $\mathbf{FC} = \mathbf{E}_{orb}\mathbf{SC}$}
+    \begin{algorithmic}[1]
+        \Statex \textbf{Input: } Fock matrix $\mathbf{F}$; Overlap matrix $\mathbf{S}$
+        \Statex \textbf{Output: Orbital coefficient matrix $\mathbf{C}$}
 
-\While{not converged}
-    \State $F_{ij} \gets \langle \phi_i \: | \: T + \sum_k^{\text{nuclei}}V_k \: |\: \phi_j \rangle + \sum_{kl} P_{kl} \Big[ G_{ijkl} - \frac{1}{2} G_{ikjl} \Big]$
-
-\EndWhile
-
-
-\end{algorithmic}
+        \State $\mathbf{F}' \gets \mathbf{S}^{-1/2} \mathbf{F} \mathbf{S}^{-1/2}$
+        \State $\vec{E}_{orb} \gets \text{Eigenvalues}(\mathbf{F}')$
+        \State $\mathbf{C}' \gets \text{Eigenvectors}(\mathbf{F}')$
+        \State $\mathbf{C} \gets \mathbf{S}^{-1/2}\mathbf{C}'$
+        \State \textbf{return} $\vec{E}_{orb}$, $\mathbf{C}$
+    \end{algorithmic}
 \end{algorithm}
 
 \end{document}
-
 
 \section{Results}
 Present sample results, such as total energies for test molecules, and compare HF and MP2 results.
