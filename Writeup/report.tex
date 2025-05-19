@@ -198,5 +198,11 @@ This project presents a compact and functional implementation of Hartree-Fock an
 Despite its correctness and clarity, the current implementation has several limitations. It supports only closed-shell, spin-restricted molecules, relies on a minimal basis set, and uses a memory-intensive four-index transformation for MP2 that limits scalability to larger systems. Future improvements could include open-shell and unrestricted Hartree-Fock support, larger and more flexible basis sets, and density fitting techniques to reduce the cost of MP2. Additionally, implementing more advanced correlation methods such as CCSD(T) or DFT would enhance the accuracy and applicability of the code. 
 
 \section*{References}
+\begin{itemize}
+    \item Psi4NumPy MP2 Tutorial: \url{https://github.com/psi4/psi4numpy/blob/master/Tutorials/05_Moller-Plesset/5a_conventional-mp2.ipynb}
+    \item Laura Gagliardi, "Hartree-Fock", Lecture 7
+    \item Laura Gagliardi, "Perturbation Theory", Lecture 10
+    \item Cramer, C. J. (2004). Essentials of Computational Chemistry: Theories and Models. John Wiley \& Sons.
+\end{itemize}
 
 \end{document}
