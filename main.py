@@ -30,6 +30,7 @@ def main():
 
     # Define molecule (default: H2O)
     mol = MOLECULE_PRESETS[args.molecule]
+    pyscf_mol = build_pyscf_molecule(mol)
     print(f"Loaded molecule: {args.molecule.upper()}")
     print(f"Number of electrons: {mol.n_electrons}")
 
