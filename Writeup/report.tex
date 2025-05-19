@@ -78,7 +78,7 @@ We start from an initial guess for the density matrix $\mathbf{P}$, construct th
 \end{algorithm}
 
 \begin{algorithm}
-    \caption{Solving the Roothaan equation $\mathbf{FC} = \boldsymbol{\varepsilon}\mathbf{SC}$ via diagonalization}
+    \caption{Solving the Roothaan equation $\mathbf{FC} = \boldsymbol{\varepsilon}\mathbf{SC}$ by diagonalizing}
     \begin{algorithmic}[1]
         \Statex \textbf{Input}: Fock matrix $\mathbf{F}$; Overlap matrix $\mathbf{S}$
         \Statex \textbf{Output}: MO coefficient matrix $\mathbf{C}$
@@ -108,7 +108,7 @@ The Møller-Plesset perturbation theory of second order (MP2) systematically inc
 
         \ForAll{occupied MOs $\psi_\mu$, $\psi_\nu$ where $\mu \neq \nu$ }
             \ForAll{unoccupied MOs $\psi_\lambda$, $\psi_\sigma$ where $\lambda \neq \sigma$}
-                \State $E_{MP2} \gets E_{MP2} + \frac{(\Gamma_{\mu \nu \lambda \sigma} - \Gamma_{\mu \nu \sigma \lambda})^2}{\varepsilon_\mu + \varepsilon_\nu - \varepsilon_\lambda - \varepsilon_\sigma}$ \Comment{Update energy correction}
+                \State $E_{MP2} \gets E_{MP2} + \frac{(\Gamma_{\mu \nu \lambda \sigma} - \Gamma_{\mu \lambda \nu \sigma})^2}{\varepsilon_\mu + \varepsilon_\nu - \varepsilon_\lambda - \varepsilon_\sigma}$ \Comment{Update energy correction}
             \EndFor
         \EndFor
 
@@ -192,8 +192,8 @@ Representative molecular orbitals were visualized for each molecule using isosur
 
 This project presents a compact and functional implementation of Hartree-Fock and MP2 methods from first principles, capable of computing electronic energies and visualizing molecular orbitals for small molecules using the STO-3G basis set. The results show good agreement with reference calculations from PySCF, validating the correctness of the self-consistent field iteration, integral evaluation, and MP2 correlation energy computation.
 
-Despite its correctness and clarity, the current implementation has several limitations. It supports only closed-shell, spin-restricted molecules, relies on a minimal basis set, and uses a memory-intensive four-index transformation for MP2 that limits scalability to larger systems. Future improvements could include open-shell and unrestricted Hartree-Fock support, larger and more flexible basis sets, and density fitting techniques to reduce the cost of MP2. Additionally, implementing more advanced correlation methods such as CCSD(T) or DFT would enhance the accuracy and applicability of the code.
+Despite its correctness and clarity, the current implementation has several limitations. It supports only closed-shell, spin-restricted molecules, relies on a minimal basis set, and uses a memory-intensive four-index transformation for MP2 that limits scalability to larger systems. Future improvements could include open-shell and unrestricted Hartree-Fock support, larger and more flexible basis sets, and density fitting techniques to reduce the cost of MP2. Additionally, implementing more advanced correlation methods such as CCSD(T) or DFT would enhance the accuracy and applicability of the code. 
 
 \section*{References}
-CCCBD Reference Values: https://cccbdb.nist.gov/energy1x.asp
+
 \end{document}
