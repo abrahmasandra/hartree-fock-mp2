@@ -102,15 +102,15 @@ The Møller-Plesset perturbation theory of second order (MP2) systematically inc
         \Statex \textbf{Input:} AO basis set $\{\phi_i\}$; MO coefficient matrix $\mathbf{C}$; MO energies $\boldsymbol{\varepsilon}$
         \Statex \textbf{Output:} MP2 energy correction $E_{MP2}$
 
-        \State $G_{ijkl} \gets (\phi_i \phi_j | \phi_k \phi_l)$ \Comment{Compute AO two-electron integrals using PySCF}
-        \State $\Gamma_{\mu \nu \lambda \sigma} \gets \sum_{ijkl} C_{i \mu} C_{j \nu} C_{k \lambda} C_{l \sigma} \cdot G_{ijkl}$ \Comment{Compute MO two-electron integrals}
+        \State $G_{\mu \nu \lambda \sigma} \gets (\phi_\mu \phi_\nu | \phi_\lambda \phi_\sigma)$ \Comment{Compute AO two-electron integrals using PySCF}
+        \State $\Gamma_{ijkl} \gets \sum_{\mu \nu \lambda \sigma} C_{\mu i} C_{\nu j} C_{\lambda k} C_{\sigma l} \cdot G_{\mu \nu \lambda \sigma}$ \Comment{Compute MO two-electron integrals}
         \State $E_{MP2} \gets 0$ \Comment{Initialize energy correction}
 
-        \ForAll{occupied MOs $\psi_\mu$, $\psi_\nu$ where $\mu \neq \nu$ }
-            \ForAll{unoccupied MOs $\psi_\lambda$, $\psi_\sigma$ where $\lambda \neq \sigma$}
+        \ForAll{occupied MOs $\psi_i$, $\psi_j$}
+            \ForAll{unoccupied MOs $\psi_k$, $\psi_l$}
                 \State $E_{MP2} \gets E_{MP2} + \frac
-                {\Gamma_{\mu \nu \lambda \sigma} \: (2 \: \cdot \: \Gamma_{\mu \nu \lambda \sigma} - \Gamma_{\mu \lambda \nu \sigma})}
-                {\varepsilon_\mu + \varepsilon_\nu - \varepsilon_\lambda - \varepsilon_\sigma}$ 
+                {\Gamma_{ijkl} \: (2 \: \cdot \: \Gamma_{ijkl} - \Gamma_{ikjl})}
+                {\varepsilon_i + \varepsilon_j - \varepsilon_k - \varepsilon_l}$ 
                 \Comment{Update energy correction}
             \EndFor
         \EndFor
