@@ -1,5 +1,6 @@
 import numpy as np
 
+## REFERENCE CODE: https://github.com/psi4/psi4numpy/blob/master/Tutorials/05_Moller-Plesset/5a_conventional-mp2.ipynb
 def transform_eri_ao_to_mo(eri_ao, C):
     """
     Transform AO-basis ERIs (μν|λσ) to MO-basis ERIs (ij|ab).
@@ -31,15 +32,14 @@ def compute_mp2_energy(eri_mo, mo_energies, n_occ):
 
     E_MP2 = 0.0
     for i in range(n_occ):
-        for j in range(i+1, n_occ):
+        for j in range(n_occ):
             for a in range(n_occ, n_orb):
-                for b in range(a+1, n_orb):
+                for b in range(n_occ, n_orb):
                     # Compute the numerator and denominator for the MP2 energy
-                    ijab = eri_mo[i, j, a, b]
                     iajb = eri_mo[i, a, j, b]
-                    numer = (ijab - iajb) ** 2
+                    ibja = eri_mo[i, b, j, a]
+                    numer = iajb * (2 * iajb - ibja)
                     denom = mo_energies[i] + mo_energies[j] - mo_energies[a] - mo_energies[b]
                     E_MP2 += numer / denom
     
     return E_MP2
-

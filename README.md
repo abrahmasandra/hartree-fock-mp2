@@ -71,6 +71,8 @@ This will run the Hartree-Fock calculation for the water molecule (H₂O) and ou
 - `--output`  
   Name of the file to save computed SCF and MP2 energy results.  
   Default: `results.txt`
+- `--visualize`
+  Flag to determine whether to visualize the MO or not
 
 ---
 
