@@ -102,13 +102,16 @@ The Møller-Plesset perturbation theory of second order (MP2) systematically inc
         \Statex \textbf{Input:} AO basis set $\{\phi_i\}$; MO coefficient matrix $\mathbf{C}$; MO energies $\boldsymbol{\varepsilon}$
         \Statex \textbf{Output:} MP2 energy correction $E_{MP2}$
 
-        \State $G_{ijkl} \gets (\phi_i \phi_j | \phi_k \phi_l)$ \Comment{Compute AO exchange integrals using PySCF}
-        \State $\Gamma_{\mu \nu \lambda \sigma} \gets \sum_{ijkl} C_{i \mu} C_{j \nu} C_{k \lambda} C_{l \sigma} \cdot g_{ijkl}$ \Comment{Compute MO exchange integrals}
+        \State $G_{ijkl} \gets (\phi_i \phi_j | \phi_k \phi_l)$ \Comment{Compute AO two-electron integrals using PySCF}
+        \State $\Gamma_{\mu \nu \lambda \sigma} \gets \sum_{ijkl} C_{i \mu} C_{j \nu} C_{k \lambda} C_{l \sigma} \cdot G_{ijkl}$ \Comment{Compute MO two-electron integrals}
         \State $E_{MP2} \gets 0$ \Comment{Initialize energy correction}
 
         \ForAll{occupied MOs $\psi_\mu$, $\psi_\nu$ where $\mu \neq \nu$ }
             \ForAll{unoccupied MOs $\psi_\lambda$, $\psi_\sigma$ where $\lambda \neq \sigma$}
-                \State $E_{MP2} \gets E_{MP2} + \frac{(\Gamma_{\mu \nu \lambda \sigma} - \Gamma_{\mu \lambda \nu \sigma})^2}{\varepsilon_\mu + \varepsilon_\nu - \varepsilon_\lambda - \varepsilon_\sigma}$ \Comment{Update energy correction}
+                \State $E_{MP2} \gets E_{MP2} + \frac
+                {\Gamma_{\mu \nu \lambda \sigma} \: (2 \: \cdot \: \Gamma_{\mu \nu \lambda \sigma} - \Gamma_{\mu \lambda \nu \sigma})}
+                {\varepsilon_\mu + \varepsilon_\nu - \varepsilon_\lambda - \varepsilon_\sigma}$ 
+                \Comment{Update energy correction}
             \EndFor
         \EndFor
 
