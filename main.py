@@ -85,6 +85,7 @@ def main():
     # Write to file
     with open(args.output, "w") as f:
 <<<<<<< HEAD
+<<<<<<< HEAD
         f.write(f"SCF Electronic Energy: {E_scf:.8f} Hartree\n")
         f.write(f"SCF Total Energy:      {E_total:.8f} Hartree\n")
         f.write(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree\n")
@@ -105,6 +106,8 @@ def main():
         title=f"Molecular Orbital {args.mo_index}"
     )
 =======
+=======
+>>>>>>> 381cfc8970c7df3a49ee8f4a2c20524fcd48a289
         f.write("--- Our energies ---")
         f.write(f"SCF Elec. Energy: {E_scf:.8f} Eh")
         f.write(f"SCF Total Energy: {E_scf_total:.8f} Eh")
@@ -136,7 +139,10 @@ def main():
             atom_symbols=mol.symbols,
             title=f"Molecular Orbital {args.mo_index}"
         )
+<<<<<<< HEAD
 >>>>>>> jshe-change-main
+=======
+>>>>>>> 381cfc8970c7df3a49ee8f4a2c20524fcd48a289
 
 if __name__ == "__main__":
     main()
