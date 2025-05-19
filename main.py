@@ -28,6 +28,12 @@ def main():
     )
     args = parser.parse_args()
 
+    # Validate arguments
+    if args.molecule not in MOLECULE_PRESETS:
+        raise ValueError(f"Invalid molecule name: {args.molecule}. Choose from {list(MOLECULE_PRESETS.keys())}.")
+    if args.mo_index < 0:
+        raise ValueError(f"Invalid MO index: {args.mo_index}. Must be a non-negative integer.")
+
     # Define molecule (default: H2O)
     mol = MOLECULE_PRESETS[args.molecule]
     print(f"Loaded molecule: {args.molecule.upper()}")
@@ -37,6 +43,10 @@ def main():
     S, T, V = compute_1e_integrals(mol)
     eri = compute_2e_integrals(mol)
     print(f"Number of basis functions (orbitals): {S.shape[0]}")
+
+    # Validate MO index
+    if args.mo_index >= S.shape[0]:
+        raise ValueError(f"Invalid MO index: {args.mo_index}. Must be less than the number of basis functions ({S.shape[0]}).")
     
     # SCF
     print()
