@@ -486,3 +486,4 @@ TSWLatexianTemp*
 # End of https://www.toptal.com/developers/gitignore/api/latex
 
 results.txt
+.DS_Store
