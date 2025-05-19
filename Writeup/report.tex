@@ -20,35 +20,37 @@
 
 \maketitle
 
-\begin{abstract}
-This report documents the implementation of the Hartree-Fock (HF) and Møller-Plesset perturbation theory (MP2) methods as developed in this repository. The focus is on the theoretical background, algorithmic details, and computational results obtained from the code.
-\end{abstract}
-
-\section{Introduction}
+\section{Overview}
 The Hartree-Fock method is a foundational approach in quantum chemistry for approximating the electronic structure of atoms and molecules. MP2 provides a post-Hartree-Fock correction to account for electron correlation effects. This report describes the implementation and results of these methods.
-
-\section{Theoretical Background}
-\subsection{Hartree-Fock Method}
-The Hartree-Fock (HF) method approximates the many-electron wavefunction as a single Slater determinant of molecular orbitals, leading to a set of coupled integro-differential equations known as the HF equations. These equations are solved iteratively using the self-consistent field (SCF) procedure: starting from an initial guess for the orbitals, the Fock matrix is constructed, diagonalized to obtain new orbitals, and the process is repeated until convergence. Basis sets, typically composed of atomic orbitals or Gaussian functions, are used to represent the molecular orbitals and make the calculations tractable.
-
-\subsection{MP2 Correction}
-The Møller-Plesset perturbation theory of second order (MP2) provides a systematic way to include electron correlation effects that are neglected in the Hartree-Fock approximation. In MP2, the total electronic energy is corrected by adding a second-order perturbative term, which accounts for the interactions between electron pairs that are not captured by the mean-field HF approach. The MP2 energy correction is computed using the HF molecular orbitals and their corresponding energies, and involves summing over all possible double excitations from occupied to virtual orbitals. This correction typically lowers the total energy and yields more accurate results for molecular properties, especially in systems where electron correlation plays a significant role.
-
-\section{Implementation Details}
 
 \subsection{Code Structure}
 
-The codebase is organized into modular components under the \texttt{src/} package. It includes \texttt{molecule.py} for representing molecular systems, and \texttt{integrals.py} for computing one- and two-electron integrals via PySCF. The Hartree-Fock SCF procedure is implemented in \texttt{scf.py}, and MP2 correlation energies are computed in \texttt{mp2.py}. \texttt{energies.py} handles the calculation of total energies including nuclear repulsion, while \texttt{orbital\_plot.py} enables 3D visualization of molecular orbitals using PyVista. The \texttt{utils.py} module contains utility functions needed for various tasks, and the \texttt{plot\_utils.py} module provides additional plotting functions. The \texttt{examples/} folder contains usage demos for common molecules, \texttt{tests/} includes unit tests and PySCF-based validation, and \texttt{main.py} provides a command-line interface to run full SCF/MP2 workflows and visualize selected orbitals.
+\begin{itemize}
+  \item \texttt{src/}
+  \begin{itemize}
+    \item \texttt{molecule.py} – Molecule class representation
+    \item \texttt{integrals.py} – Computes 1- and 2-electron integrals using PySCF
+    \item \texttt{scf.py} – Restricted Hartree-Fock SCF procedure
+    \item \texttt{mp2.py} – Møller-Plesset perturbation theory energy corrections
+    \item \texttt{energies.py} – Computing total and nuclear repulsion energies
+    \item \texttt{orbital\_plot.py} – 3D visualization of molecular orbitals using PyVista
+    \item \texttt{utils.py} – Miscellaneous utilities, including PySCF helper functions
+    \item \texttt{plot\_utils.py} – Additional plotting functions.
+  \end{itemize}
+  \item \texttt{examples/} – Usage demos for common molecules.
+  \item \texttt{tests/} – Unit tests and PySCF-based validation.
+  \item \texttt{main.py} – A command-line interface to run full SCF/MP2 workflows and visualize selected orbitals.
+\end{itemize}
 
 \subsection{Algorithms}
 
 \subsubsection*{Hartree-Fock Self-Consistent Field (SCF)}
 
-We implemented a Hartree-Fock SCF procedure which iteratively solves the Roothaan equations:
+The restricted Hartree-Fock (RHF) method approximates the many-electron wavefunction as a single Slater determinant of molecular orbitals. The resulting Hartree-Fock equation can then be solved iteratively by making a mean-field assumption and running a self-consistent field (SCF) procedure. Here, we specifically solve a representation of the Hartree-Fock equation known as the Roothaan equations. 
 \[
 \mathbf{F} \mathbf{C} = \mathbf{S} \mathbf{C} \boldsymbol{\varepsilon}
 \]
-where $\mathbf{F}$ is the Fock matrix, $\mathbf{C}$ is the matrix of molecular orbitals, $\mathbf{S}$ is the overlap matrix, and $\boldsymbol{\varepsilon}$ is the diagonal matrix of orbital energies. The density matrix is updated at each iteration until convergence is achieved. Pseudocode for our SCF procedure and an orthogonalization solution to the Roothaan equations are provided in Algorithms \ref{alg:scf} and \ref{alg:roothaan}. 
+We start from an initial guess for the density matrix $\mathbf{P}$, construct the Fock matrix $\mathbf{F}$, and then diagonalize it to obtain molecular orbital coefficients $\mathbf{C}$ and energies $\boldsymbol{\varepsilon}$. $\mathbf{C}$ is used to update $\mathbf{P}$ and the electronic energy can be computed from $\mathbf{P}$ and $\mathbf{F}$. This procedure is repeated until energy convergence. Annotated pseudo-codes for our SCF procedure, as well as the diagonalization of the Roothaan equations, are provided in Algorithms \ref{alg:scf} and \ref{alg:roothaan}. 
 
 \begin{algorithm}[H]
     \caption{Hartree-Fock Self-Consistent Field (SCF) Method}
@@ -66,7 +68,7 @@ where $\mathbf{F}$ is the Fock matrix, $\mathbf{C}$ is the matrix of molecular o
         
         \While{$\Delta E_{el} > \epsilon$}
             \State $F_{ij} \gets H_{ij} + \sum_{kl} P_{kl} \big[ G_{ijkl} - \frac{1}{2} G_{ikjl} \big]$ \Comment{Fock matrix}
-            \State $\mathbf{C}, \boldsymbol{\varepsilon} \gets \text{SolveRoothaan} (\mathbf{F}, \mathbf{S})$  \Comment{Orbital coefficents and energies}
+            \State $\mathbf{C}, \boldsymbol{\varepsilon} \gets \text{SolveRoothaan} (\mathbf{F}, \mathbf{S})$  \Comment{Compute MO coefficients and energies}
             \State $\mathbf{P} \gets \mathbf{C}\mathbf{C}^T$ \Comment{Update density matrix}
             \State $E_{el} \gets \sum_{ij} P_{ij} (H_{ij} + F_{ij})$ \Comment{Compute electronic energy}
         \EndWhile
@@ -75,16 +77,16 @@ where $\mathbf{F}$ is the Fock matrix, $\mathbf{C}$ is the matrix of molecular o
     \label{alg:scf}
 \end{algorithm}
 
-\begin{algorithm}[H]
-    \caption{Solving the Roothaan equation $\mathbf{FC} = \boldsymbol{\varepsilon}\mathbf{SC}$}
+\begin{algorithm}
+    \caption{Solving the Roothaan equation $\mathbf{FC} = \boldsymbol{\varepsilon}\mathbf{SC}$ via diagonalization}
     \begin{algorithmic}[1]
         \Statex \textbf{Input}: Fock matrix $\mathbf{F}$; Overlap matrix $\mathbf{S}$
         \Statex \textbf{Output}: MO coefficient matrix $\mathbf{C}$
 
-        \State $\mathbf{F}' \gets \mathbf{S}^{-\frac{1}{2}} \mathbf{F} \mathbf{S}^{-\frac{1}{2}}$ \Comment{Move Fock matrix to orthogonal basis}
+        \State $\mathbf{F}' \gets \mathbf{S}^{-\frac{1}{2}} \mathbf{F} \mathbf{S}^{-\frac{1}{2}}$ \Comment{Move Fock matrix to orthonormal basis}
         \State $\boldsymbol{\varepsilon} \gets \text{Eigenvalues}(\mathbf{F}')$ \Comment{Compute MO energies using NumPy}
-        \State $\mathbf{C}' \gets \text{Eigenvectors}(\mathbf{F}')$ \Comment{Compute MO coefficients in basis using NumPy}
-        \State $\mathbf{C} \gets \mathbf{S}^{-\frac{1}{2}}\mathbf{C}'$ \Comment{Move MO coefficient matrix out of orthogonal basis}
+        \State $\mathbf{C}' \gets \text{Eigenvectors}(\mathbf{F}')$ \Comment{Compute MO coefficients using NumPy}
+        \State $\mathbf{C} \gets \mathbf{S}^{-\frac{1}{2}}\mathbf{C}'$ \Comment{Move MO coefficient matrix out of orthonormal basis}
         \State \textbf{return} $\boldsymbol{\varepsilon}$, $\mathbf{C}$
     \end{algorithmic}
     \label{alg:roothaan}
@@ -92,7 +94,7 @@ where $\mathbf{F}$ is the Fock matrix, $\mathbf{C}$ is the matrix of molecular o
 
 \subsubsection*{MP2 Energy Correction}
 
-Second-order Møller–Plesset perturbation theory (MP2) provides a perturbation correction to the Hartree-Fock energy by accounting for electron correlations. Pseudocode is provided in Algorithm \ref{alg:mp2}. 
+The Møller-Plesset perturbation theory of second order (MP2) systematically includes electron correlation effects neglected by RHF. Given the MOs, the perturbative correction is computed by summing over all possible double excitations from occupied to virtual orbitals. This typically lowers the total energy, yielding more accurate results for systems where electron correlation plays a significant role. An annotated pseudo-code of our implementation is provided in Algorithm \ref{alg:mp2}. 
 
 \begin{algorithm}[H]
     \caption{Computation of MP2 Energy Correction}
@@ -162,24 +164,24 @@ Representative molecular orbitals were visualized for each molecule using isosur
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}[b]{0.45\textwidth}
+    \begin{subfigure}[b]{0.25\textwidth}
         \includegraphics[width=\textwidth]{figures/h2_homo.png}
         \caption{\ce{H2} HOMO}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
+    \hspace{1em}
+    \begin{subfigure}[b]{0.25\textwidth}
         \includegraphics[width=\textwidth]{figures/h2o_homo.png}
         \caption{\ce{H2O} HOMO}
     \end{subfigure}
 
     \vspace{1em}
-
-    \begin{subfigure}[b]{0.45\textwidth}
+    
+    \begin{subfigure}[b]{0.25\textwidth}
         \includegraphics[width=\textwidth]{figures/nh3_homo.png}
         \caption{\ce{NH3} HOMO}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
+    \hspace{1em}
+    \begin{subfigure}[b]{0.25\textwidth}
         \includegraphics[width=\textwidth]{figures/ch4_homo.png}
         \caption{\ce{CH4} HOMO}
     \end{subfigure}
