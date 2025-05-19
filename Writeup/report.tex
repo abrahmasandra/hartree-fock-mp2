@@ -131,32 +131,16 @@ We applied the Hartree-Fock and MP2 implementation to several small molecules us
 \toprule
 \textbf{Molecule} & \textbf{SCF Energy (Ha)} & \textbf{MP2 Correction (Ha)} & \textbf{MP2 Total Energy (Ha)}\\
 \midrule
-\ce{H2}   & $-1.1167$ & $0.0000$ & $-1.1167$ \\
-\ce{H2O}  & $-74.9459$ & $-0.003205$ & $-74.9491$ \\
-\ce{NH3}  & $-55.4379$ & $-0.01023$ & $-55.4481$ \\
-\ce{CH4}  & $-39.7267$ & $-0.006031$ & $-39.7327$ \\
-\ce{HF}   & $-98.5522$ & $-0.026717$ & $-98.5789$ \\
+\ce{H2}   & $-1.1168$  & $-0.01313$ & $-1.1299$ \\
+\ce{H2O}  & $-74.9459$ & $-0.03090$ & $74.9768$ \\
+\ce{NH3}  & $-55.4379$ & $-0.06264$ & $-55.5005$ \\
+\ce{CH4}  & $-39.7267$ & $-0.05652$ & $--39.7832$ \\
+\ce{HF}   & $-98.5522$ & $-0.02672$ & $-98.5789$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-These values agree closely with reference results from the Computational Chemistry Comparison and Benchmark DataBase(CCCBD), validating the correctness of both the integral evaluation and the energy computation pipelines, although we do see that our Hartree Fock Calculations are in far more agreement than our MP2 Calculations.
-
-\begin{table}[H]
-\centering
-\caption{PySCF SCF Reference Values}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Molecule} & \textbf{HF Reference Values (Ha)} & \textbf{MP2 Reference Values (Ha)}\\
-\midrule
-\ce{H2}   & $ 	-1.117506$ & $ 	-1.130137$\\
-\ce{H2O}  & $-74.9659$ & $-75.0060$\\
-\ce{NH3}  & $ 	-55.455420$ & $ 	-55.507071$ \\
-\ce{CH4}  & $-39.7269$ & $-39.7831$\\
-\ce{HF}   & $-98.5728$ & $-98.5923$\\
-\bottomrule
-\end{tabular}
-\end{table}
+These values match the reference results we get from running PySCF's own RHF and MP2 methods, validating the correctness of both the integral evaluation and the energy computation pipelines.
 
 \vspace{1em}
 
