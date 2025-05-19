@@ -61,11 +61,24 @@ Outline the organization of the codebase and key modules.
 
 \section{Results}
 Using our code, we calculated the energies of different molecular systems, where we calculated the energy and compared these results with the established literature values
-\begin{itemize}
-    \item Energy of $\ce{H2O}$: -84.2310577768
-    \item Energy of $\ce{H2}$:
-\end{itemize}
 Present sample results, such as total energies for test molecules, and compare HF and MP2 results.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{||c|c|c||}
+        \hline
+        \textbf{Molecule} & \textbf{Hartree Fock Energy (a.u.)} & \textbf{Møller-Plesset Energy (a.u.)} \\
+        \hline
+        $\ce{H2O}$ & indeterminable & 157 MHz\\
+        \hline
+        $\ce{^87Rb(F^\prime=2)}$ to $\ce{^87Rb(F^\prime=3)}$ & $186 \pm 6$ MHz & 267 MHz\\
+        \hline
+        $\ce{^85Rb(F^\prime=2)}$ to $\ce{^85Rb(F^\prime=3)}$ & $57 \pm 6$ MHz & 63 MHz\\
+        \hline
+        $\ce{^85Rb(F^\prime=3)}$ to $\ce{^85Rb(F^\prime=4)}$ & $97 \pm 6$ MHz & 121 MHz\\
+        \hline
+    \end{tabular}
+    \caption{Comparison of Experimental Results with the Literature}
+\end{table}
 
 \section{Conclusion}
 Summarize findings and discuss possible improvements or future work.
