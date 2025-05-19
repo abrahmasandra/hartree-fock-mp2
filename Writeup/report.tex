@@ -52,7 +52,7 @@ The restricted Hartree-Fock (RHF) method approximates the many-electron wavefunc
 \]
 We start from an initial guess for the density matrix $\mathbf{P}$, construct the Fock matrix $\mathbf{F}$, and then diagonalize it to obtain molecular orbital coefficients $\mathbf{C}$ and energies $\boldsymbol{\varepsilon}$. $\mathbf{C}$ is used to update $\mathbf{P}$ and the electronic energy can be computed from $\mathbf{P}$ and $\mathbf{F}$. This procedure is repeated until energy convergence. Annotated pseudo-codes for our SCF procedure, as well as the diagonalization of the Roothaan equations, are provided in Algorithms \ref{alg:scf} and \ref{alg:roothaan}. 
 
-\begin{algorithm}
+\begin{algorithm}[H]
     \caption{Hartree-Fock Self-Consistent Field (SCF) Method}
     \begin{algorithmic}[1]
     
@@ -96,7 +96,7 @@ We start from an initial guess for the density matrix $\mathbf{P}$, construct th
 
 The Møller-Plesset perturbation theory of second order (MP2) systematically includes electron correlation effects neglected by RHF. Given the MOs, the perturbative correction is computed by summing over all possible double excitations from occupied to virtual orbitals. This typically lowers the total energy, yielding more accurate results for systems where electron correlation plays a significant role. An annotated pseudo-code of our implementation is provided in Algorithm \ref{alg:mp2}. 
 
-\begin{algorithm}
+\begin{algorithm}[H]
     \caption{Computation of MP2 Energy Correction}
     \begin{algorithmic}[1]
         \Statex \textbf{Input:} AO basis set $\{\phi_i\}$; MO coefficient matrix $\mathbf{C}$; MO energies $\boldsymbol{\varepsilon}$
@@ -127,19 +127,36 @@ We applied the Hartree-Fock and MP2 implementation to several small molecules us
 \caption{Computed Energies for Test Molecules (STO-3G)}
 \begin{tabular}{lccc}
 \toprule
-\textbf{Molecule} & \textbf{SCF Energy (Ha)} & \textbf{MP2 Correction (Ha)} & \textbf{MP2 Total Energy (Ha)} \\
+\textbf{Molecule} & \textbf{SCF Energy (Ha)} & \textbf{MP2 Correction (Ha)} & \textbf{MP2 Total Energy (Ha)}\\
 \midrule
 \ce{H2}   & $-1.1167$ & $0.0000$ & $-1.1167$ \\
 \ce{H2O}  & $-74.9459$ & $-0.003205$ & $-74.9491$ \\
 \ce{NH3}  & $-55.4379$ & $-0.01023$ & $-55.4481$ \\
 \ce{CH4}  & $-39.7267$ & $-0.006031$ & $-39.7327$ \\
+\ce{HF}   & $-98.5522$ & $-0.026717$ & $-98.5789$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These values agree closely with reference results from the Computational Chemistry Comparison and Benchmark DataBase(CCCBD), validating the correctness of both the integral evaluation and the energy computation pipelines, although we do see that our Hartree Fock Calculations are in far more agreement than our MP2 Calculations.
+
+\begin{table}[H]
+\centering
+\caption{PySCF SCF Reference Values}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Molecule} & \textbf{HF Reference Values (Ha)} & \textbf{MP2 Reference Values (Ha)}\\
+\midrule
+\ce{H2}   & $ 	-1.117506$ & $ 	-1.130137$\\
+\ce{H2O}  & $-74.9659$ & $-75.0060$\\
+\ce{NH3}  & $ 	-55.455420$ & $ 	-55.507071$ \\
+\ce{CH4}  & $-39.7269$ & $-39.7831$\\
+\ce{HF}   & $-98.5728$ & $-98.5923$\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \vspace{1em}
-
-These values agree closely with reference results from PySCF, validating the correctness of both the integral evaluation and the energy computation pipelines.
 
 \subsection*{Molecular Orbital Visualizations}
 
@@ -179,6 +196,5 @@ This project presents a compact and functional implementation of Hartree-Fock an
 Despite its correctness and clarity, the current implementation has several limitations. It supports only closed-shell, spin-restricted molecules, relies on a minimal basis set, and uses a memory-intensive four-index transformation for MP2 that limits scalability to larger systems. Future improvements could include open-shell and unrestricted Hartree-Fock support, larger and more flexible basis sets, and density fitting techniques to reduce the cost of MP2. Additionally, implementing more advanced correlation methods such as CCSD(T) or DFT would enhance the accuracy and applicability of the code.
 
 \section*{References}
-List references to textbooks, articles, or documentation used.
-
+CCCBD Reference Values: https://cccbdb.nist.gov/energy1x.asp
 \end{document}
