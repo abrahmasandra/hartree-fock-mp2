@@ -19,6 +19,7 @@ def get_pyscf_reference(mol: Molecule):
 
 def main():
     parser = argparse.ArgumentParser(description="Run HF + MP2 and visualize MO.")
+    parser.add_argument('--visualize', action='store_true', default=False, help="Visualize orbitals?")
     parser.add_argument("--mo-index", type=int, default=0, help="Molecular orbital index to visualize")
     parser.add_argument("--output", type=str, default="results.txt", help="Output file for energies")
     parser.add_argument(
@@ -33,37 +34,57 @@ def main():
     print(f"Loaded molecule: {args.molecule.upper()}")
     print(f"Number of electrons: {mol.n_electrons}")
 
-
     # Integrals
     S, T, V = compute_1e_integrals(mol)
+    eri = compute_2e_integrals(mol)
     print(f"Number of basis functions (orbitals): {S.shape[0]}")
     
-    eri = compute_2e_integrals(mol)
-
     # SCF
+    print()
+    print(" > Running SCF procedure...")
     E_scf, eps, C, D, history = run_scf(S, T, V, eri, mol.n_electrons)
-    E_total = compute_total_energy(E_scf, mol)
+    E_scf_total = compute_total_energy(E_scf, mol)
+    print(" > Done.")
 
     # MP2
+    print()
+    print(" > Computing MP2 correction...")
     eri_mo = transform_eri_ao_to_mo(eri, C)
     E_mp2_corr = compute_mp2_energy(eri_mo, eps, mol.n_electrons // 2)
-    E_mp2_total = E_total + E_mp2_corr
+    E_mp2_total = E_scf_total + E_mp2_corr
+    print(" > Done.")
 
-    # Print energies
-    print(f"SCF Electronic Energy: {E_scf:.8f} Hartree")
-    print(f"SCF Total Energy:      {E_total:.8f} Hartree")
-    print(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree")
-    print(f"MP2 Total Energy:      {E_mp2_total:.8f} Hartree")
+    # PySCF
+    print()
+    print(" > Computing PySCF reference values...")
+    E_scf_total_ref, E_mp2_corr_ref, E_mp2_total_ref = get_pyscf_reference(mol)
+    print(" > Done.")
+
+    # Report energies
+    print()
+    print("--- Our energies ---")
+    print(f"SCF Elec. Energy: {E_scf:.8f} Eh")
+    print(f"SCF Total Energy: {E_scf_total:.8f} Eh")
+    print(f"MP2 Corr. Energy: {E_mp2_corr:.8f} Eh")
+    print(f"MP2 Total Energy: {E_mp2_total:.8f} Eh")
 
     # Reference energies from PySCF
-    E_scf_ref, E_mp2_corr_ref, E_mp2_total_ref = get_pyscf_reference(mol)
-    print("--- Reference Values (PySCF) ---")
-    print(f"PySCF SCF Total Energy:     {E_scf_ref:.8f} Hartree")
-    print(f"PySCF MP2 Correction:       {E_mp2_corr_ref:.8f} Hartree")
-    print(f"PySCF MP2 Total Energy:     {E_mp2_total_ref:.8f} Hartree")
+    print()
+    print("--- PySCF energies ---")
+    print(f"SCF Total Energy: {E_scf_total_ref:.8f} Eh")
+    print(f"MP2 Corr. Energy: {E_mp2_corr_ref:.8f} Eh")
+    print(f"MP2 Total Energy: {E_mp2_total_ref:.8f} Eh")
+
+    # Errors
+    print()
+    print("--- Our error ---")
+    print(f"SCF Total Energy: {abs(E_scf_total - E_scf_total_ref):.8f} Eh")
+    print(f"MP2 Corr. Energy: {abs(E_mp2_corr - E_mp2_corr_ref):.8f} Eh")
+    print(f"MP2 Total Energy: {abs(E_mp2_total - E_mp2_total_ref):.8f} Eh")
 
     # Write to file
     with open(args.output, "w") as f:
+<<<<<<< HEAD
         f.write(f"SCF Electronic Energy: {E_scf:.8f} Hartree\n")
         f.write(f"SCF Total Energy:      {E_total:.8f} Hartree\n")
         f.write(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree\n")
@@ -83,6 +104,39 @@ def main():
         atom_symbols=mol.symbols,
         title=f"Molecular Orbital {args.mo_index}"
     )
+=======
+        f.write("--- Our energies ---")
+        f.write(f"SCF Elec. Energy: {E_scf:.8f} Eh")
+        f.write(f"SCF Total Energy: {E_scf_total:.8f} Eh")
+        f.write(f"MP2 Corr. Energy: {E_mp2_corr:.8f} Eh")
+        f.write(f"MP2 Total Energy: {E_mp2_total:.8f} Eh")
+    
+        # Reference energies from PySCF
+        f.write("\n")
+        f.write("--- PySCF energies ---")
+        f.write(f"SCF Total Energy: {E_scf_total_ref:.8f} Eh")
+        f.write(f"MP2 Corr. Energy: {E_mp2_corr_ref:.8f} Eh")
+        f.write(f"MP2 Total Energy: {E_mp2_total_ref:.8f} Eh")
+    
+        # Errors
+        f.write("\n")
+        f.write("--- Our error ---")
+        f.write(f"SCF Total Energy: {abs(E_scf_total - E_scf_total_ref):.8f} Eh")
+        f.write(f"MP2 Corr. Energy: {abs(E_mp2_corr - E_mp2_corr_ref):.8f} Eh")
+        f.write(f"MP2 Total Energy: {abs(E_mp2_total - E_mp2_total_ref):.8f} Eh")
+
+    # Visualize MO
+    if args.visualize:
+        pyscf_mol = build_pyscf_molecule(mol)
+        mo_grid, grid_pts = evaluate_mo_on_grid(pyscf_mol, C, mo_index=args.mo_index)
+    
+        plot_molecular_orbital(
+            mo_grid, grid_pts,
+            atom_coords=mol.coordinates,
+            atom_symbols=mol.symbols,
+            title=f"Molecular Orbital {args.mo_index}"
+        )
+>>>>>>> jshe-change-main
 
 if __name__ == "__main__":
     main()
