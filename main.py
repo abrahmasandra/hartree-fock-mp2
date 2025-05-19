@@ -30,7 +30,6 @@ def main():
 
     # Define molecule (default: H2O)
     mol = MOLECULE_PRESETS[args.molecule]
-    pyscf_mol = build_pyscf_molecule(mol)
     print(f"Loaded molecule: {args.molecule.upper()}")
     print(f"Number of electrons: {mol.n_electrons}")
 
@@ -84,30 +83,6 @@ def main():
 
     # Write to file
     with open(args.output, "w") as f:
-<<<<<<< HEAD
-<<<<<<< HEAD
-        f.write(f"SCF Electronic Energy: {E_scf:.8f} Hartree\n")
-        f.write(f"SCF Total Energy:      {E_total:.8f} Hartree\n")
-        f.write(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree\n")
-        f.write(f"MP2 Total Energy:      {E_mp2_total:.8f} Hartree\n")
-
-        f.write("--- Reference Values (PySCF) ---\n")
-        f.write(f"PySCF SCF Total Energy:     {E_scf_ref:.8f} Hartree\n")
-        f.write(f"PySCF MP2 Correction:       {E_mp2_corr_ref:.8f} Hartree\n")
-        f.write(f"PySCF MP2 Total Energy:     {E_mp2_total_ref:.8f} Hartree\n")
-
-    # Visualize MO
-    mo_grid, grid_pts = evaluate_mo_on_grid(pyscf_mol, C, mo_index=args.mo_index)
-
-    plot_molecular_orbital(
-        mo_grid, grid_pts,
-        atom_coords=mol.coordinates,
-        atom_symbols=mol.symbols,
-        title=f"Molecular Orbital {args.mo_index}"
-    )
-=======
-=======
->>>>>>> 381cfc8970c7df3a49ee8f4a2c20524fcd48a289
         f.write("--- Our energies ---")
         f.write(f"SCF Elec. Energy: {E_scf:.8f} Eh")
         f.write(f"SCF Total Energy: {E_scf_total:.8f} Eh")
@@ -139,10 +114,6 @@ def main():
             atom_symbols=mol.symbols,
             title=f"Molecular Orbital {args.mo_index}"
         )
-<<<<<<< HEAD
->>>>>>> jshe-change-main
-=======
->>>>>>> 381cfc8970c7df3a49ee8f4a2c20524fcd48a289
 
 if __name__ == "__main__":
     main()
