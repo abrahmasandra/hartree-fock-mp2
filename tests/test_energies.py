@@ -6,7 +6,7 @@ from src.energies import compute_total_energy, compute_nuclear_repulsion_energy
 
 from pyscf import gto, scf, mp
 
-def compare_energies(symbols, coords, hf_tol=1e-1, mp2_tol=1e-1):
+def compare_energies(symbols, coords, hf_tol=1e-3, mp2_tol=1e-3):
     mol = Molecule(symbols, coords)
     S, T, V = compute_1e_integrals(mol)
     eri = compute_2e_integrals(mol)
