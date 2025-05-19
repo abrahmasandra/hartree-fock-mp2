@@ -48,7 +48,7 @@ pip install -r requirements.txt
 You can run the main driver script using:
 
 ```bash
-python main.py --molecule h2o --mo-index 3 --output results.txt
+python main.py --molecule h2o --visualize --mo-index 3 --output results.txt
 ```
 
 This will run the Hartree-Fock calculation for the water molecule (H₂O) and output the results to `results.txt`. You can specify different molecules and molecular orbital indices as needed.
@@ -77,7 +77,7 @@ This will run the Hartree-Fock calculation for the water molecule (H₂O) and ou
 ### 📥 Example: Run MP2 calculation on ammonia and visualize the HOMO
 
 ```bash
-python main.py --molecule nh3 --mo-index 4 --output nh3_energy.txt
+python main.py --molecule nh3 --visualize --mo-index 4 --output nh3_energy.txt
 ```
 
 This will:
