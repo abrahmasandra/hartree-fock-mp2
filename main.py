@@ -29,6 +29,7 @@ def main():
 
     # Define molecule (default: H2O)
     mol = MOLECULE_PRESETS[args.molecule]
+    pyscf_mol = build_pyscf_molecule(mol)
     print(f"Loaded molecule: {args.molecule.upper()}")
     print(f"Number of electrons: {mol.n_electrons}")
 
@@ -67,13 +68,13 @@ def main():
         f.write(f"SCF Total Energy:      {E_total:.8f} Hartree\n")
         f.write(f"MP2 Correlation Energy:{E_mp2_corr:.8f} Hartree\n")
         f.write(f"MP2 Total Energy:      {E_mp2_total:.8f} Hartree\n")
+
         f.write("--- Reference Values (PySCF) ---\n")
         f.write(f"PySCF SCF Total Energy:     {E_scf_ref:.8f} Hartree\n")
         f.write(f"PySCF MP2 Correction:       {E_mp2_corr_ref:.8f} Hartree\n")
         f.write(f"PySCF MP2 Total Energy:     {E_mp2_total_ref:.8f} Hartree\n")
 
     # Visualize MO
-    pyscf_mol = build_pyscf_molecule(mol)
     mo_grid, grid_pts = evaluate_mo_on_grid(pyscf_mol, C, mo_index=args.mo_index)
 
     plot_molecular_orbital(
