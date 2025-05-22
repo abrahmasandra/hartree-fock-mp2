@@ -59,7 +59,7 @@ We start from an initial guess for the density matrix $\mathbf{P}$, construct th
         \Statex \textbf{Input:} Atomic orbital basis set $\{\phi_i\}$; Convergence criteria $\epsilon$
         \Statex \textbf{Output:} Electronic energy $E_{el}$, MO energies $\boldsymbol{\varepsilon}$, MO coefficients $\mathbf{C}$, Density matrix $\mathbf{P}$
         
-        \State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{AO exchange integral matrix from PySCF}
+        \State $G_{ijkl} \gets (\phi_i\phi_j|\phi_k\phi_l)$ \Comment{AO two-electron integral matrix from PySCF}
         \State $S_{ij} \gets \langle \phi_i | \phi_j \rangle$ \Comment{AO overlap matrix from PySCF}
         \State $T_{ij} \gets \langle \phi_i \: | \: -\frac{1}{2}\nabla^2 \: |\: \phi_j \rangle$ \Comment{AO kinetic energy matrix from PySCF}
         \State $V_{ij} \gets \langle \phi_i \: | \: -\sum_k^{\text{nuclei}} \frac{Z_k}{r_k} \: | \: \phi_j \rangle$ \Comment{AO nuclear potential energy matrix from PySCF}
@@ -102,8 +102,8 @@ The Møller-Plesset perturbation theory of second order (MP2) systematically inc
         \Statex \textbf{Input:} AO basis set $\{\phi_i\}$; MO coefficient matrix $\mathbf{C}$; MO energies $\boldsymbol{\varepsilon}$
         \Statex \textbf{Output:} MP2 energy correction $E_{MP2}$
 
-        \State $G_{\mu \nu \lambda \sigma} \gets (\phi_\mu \phi_\nu | \phi_\lambda \phi_\sigma)$ \Comment{Compute AO two-electron integrals using PySCF}
-        \State $\Gamma_{ijkl} \gets \sum_{\mu \nu \lambda \sigma} C_{\mu i} C_{\nu j} C_{\lambda k} C_{\sigma l} \cdot G_{\mu \nu \lambda \sigma}$ \Comment{Compute MO two-electron integrals}
+        \State $G_{\mu \nu \lambda \sigma} \gets (\phi_\mu \phi_\nu | \phi_\lambda \phi_\sigma)$ \Comment{AO two-electron integrals from PySCF}
+        \State $\Gamma_{ijkl} \gets \sum_{\mu \nu \lambda \sigma} C_{\mu i} C_{\nu j} C_{\lambda k} C_{\sigma l} \cdot G_{\mu \nu \lambda \sigma}$ \Comment{MO two-electron integrals}
         \State $E_{MP2} \gets 0$ \Comment{Initialize energy correction}
 
         \ForAll{occupied MOs $\psi_i$, $\psi_j$}
